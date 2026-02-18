@@ -3,36 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel</title>
+    <title>Admin Panel - Control Center</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
 </head>
-<body>
-    <div class="container">
-        <div class="form-box shadow" style="background:white; padding:20px; border-radius:15px; margin-top:20px;">
-            <h3>➕ ပစ္စည်းအသစ်ထည့်မည်</h3>
-            <input type="text" id="pName" placeholder="ပစ္စည်းအမည်">
-            <input type="number" id="pPrice" placeholder="စျေးနှုန်း">
-            
-            <p style="font-size: 14px; margin-bottom: 5px;">အမျိုးအစား (ရိုက်ထည့်ပါ သို့မဟုတ် ရွေးပါ):</p>
-            <input type="text" id="pCat" list="category-options" placeholder="အမျိုးအစား">
-            <datalist id="category-options">
-                <option value="အကျီ"><option value="ဘောင်းဘီ"><option value="ဖိနပ်"><option value="အိတ်">
-            </datalist>
+<body style="background: #f4f7f6;">
 
-            <input type="number" id="pStock" placeholder="Stock အရေအတွက်">
-            <input type="text" id="pImg" placeholder="ပုံ Link (Direct Link)">
-            <button class="btn-primary" onclick="addProduct()">ပစ္စည်းတင်မည်</button>
+    <div class="container">
+        <header style="display: flex; justify-content: space-between; align-items: center; padding: 20px 0;">
+            <h2>🛠 Admin Control Panel</h2>
             <button onclick="location.href='index.html'" class="btn-outline">Shop သို့သွားရန်</button>
+        </header>
+
+        <div class="form-box shadow" style="background:white; padding:25px; border-radius:15px;">
+            <h3>➕ ပစ္စည်းအသစ်ထည့်မည်</h3>
+            <div style="display: grid; gap: 10px;">
+                <input type="text" id="pName" placeholder="ပစ္စည်းအမည်" class="form-control">
+                <input type="number" id="pPrice" placeholder="စျေးနှုန်း (MMK)" class="form-control">
+                
+                <input type="text" id="pCat" list="category-options" placeholder="အမျိုးအစား (ဥပမာ- ဘီယာ၊ အကျီ)" class="form-control">
+                <datalist id="category-options">
+                    <option value="ဘီယာ">
+                    <option value="ဖျော်ရည်">
+                    <option value="မုန့်">
+                </datalist>
+
+                <input type="number" id="pStock" placeholder="Stock အရေအတွက်" class="form-control">
+                <input type="text" id="pImg" placeholder="ပုံ Link (Direct Link)" class="form-control">
+                
+                <button class="btn-primary" onclick="addProduct()" style="padding: 12px;">ပစ္စည်းတင်မည်</button>
+            </div>
         </div>
 
-        <div id="admin-list" class="admin-grid" style="margin-top:20px;"></div>
+        <hr style="margin: 30px 0;">
+
+        <h3>📦 လက်ရှိတင်ထားသော ပစ္စည်းများ</h3>
+        <div id="admin-list" class="admin-grid" style="margin-top:20px;">
+            <p style="text-align: center;">Loading...</p>
+        </div>
     </div>
 
     <script>
-        // သင့်ရဲ့ Config အသစ်ကို အမှန်ထည့်ပေးထားပါတယ်
+        // ၁။ Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyD0oFN72HDNioauZHRyPd3Oh_I04abNgDs",
             authDomain: "marker1-6736f.firebaseapp.com",
@@ -44,7 +58,25 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const auth = firebase.auth();
 
+        // ၂။ လုံခြုံရေးအတွက် Admin ဟုတ်မဟုတ် စစ်ဆေးခြင်း
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                // admin@gmail.com ဖြစ်မှ ပေးဝင်မည်
+                if (user.email === "admin@gmail.com") {
+                    loadAdminProducts();
+                } else {
+                    alert("သင်သည် Admin မဟုတ်ပါသဖြင့် ဝင်ခွင့်မရှိပါ။");
+                    window.location.href = "index.html";
+                }
+            } else {
+                // Login မဝင်ထားလျှင် Login Page သို့ ပို့မည်
+                window.location.href = "login.html";
+            }
+        });
+
+        // ၃။ ပစ္စည်းအသစ်တင်ခြင်း
         async function addProduct() {
             const name = document.getElementById('pName').value;
             const price = document.getElementById('pPrice').value;
@@ -53,7 +85,7 @@
             const img = document.getElementById('pImg').value;
 
             if (!name || !price || !cat || !img) {
-                return alert("အချက်အလက်အားလုံး ပြည့်စုံအောင် ဖြည့်ပေးပါ");
+                return alert("အချက်အလက်အားလုံး ဖြည့်ပေးပါ");
             }
 
             try {
@@ -63,8 +95,9 @@
                     category: cat,
                     stock: Number(stock) || 0,
                     image: img,
-                    createdAt: new Date().getTime()
+                    createdAt: new Date().getTime() // စီရန်အတွက် အချိန်မှတ်သားခြင်း
                 });
+
                 alert("ပစ္စည်းတင်ပြီးပါပြီ");
                 location.reload();
             } catch (e) {
@@ -72,8 +105,8 @@
             }
         }
 
+        // ၄။ ပစ္စည်းစာရင်းပြသခြင်းနှင့် ဖျက်ခြင်း
         function loadAdminProducts() {
-            // orderBy ထည့်ပြီး အချိန်အလိုက် စီပေးထားပါတယ်
             db.collection("products").orderBy("createdAt", "desc").onSnapshot(snap => {
                 const list = document.getElementById("admin-list");
                 if (!list) return;
@@ -81,26 +114,26 @@
                 list.innerHTML = snap.docs.map(doc => {
                     const p = doc.data();
                     return `
-                        <div class="admin-item shadow" style="display:flex; justify-content:space-between; align-items:center; background:white; padding:15px; margin-bottom:10px; border-radius:10px;">
+                        <div class="admin-item shadow" style="display:flex; justify-content:space-between; align-items:center; background:white; padding:15px; margin-bottom:12px; border-radius:12px; border-left: 5px solid #007bff;">
                             <div style="display:flex; align-items:center; gap:15px;">
-                                <img src="${p.image}" style="width:50px; height:50px; border-radius:8px; object-fit:cover;" onerror="this.src='https://via.placeholder.com/50'">
+                                <img src="${p.image}" style="width:60px; height:60px; border-radius:10px; object-fit:cover;" onerror="this.src='https://via.placeholder.com/60'">
                                 <div>
-                                    <strong style="display:block;">${p.name}</strong>
-                                    <small style="color:gray;">${p.price} MMK | ${p.category}</small>
+                                    <strong style="display:block; font-size: 16px;">${p.name}</strong>
+                                    <small style="color:gray;">${p.price} MMK | ${p.category} | Stock: ${p.stock}</small>
                                 </div>
                             </div>
-                            <button onclick="deleteProduct('${doc.id}')" style="background:#ff4757; color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer;">ဖျက်မည်</button>
+                            <button onclick="deleteProduct('${doc.id}')" style="background:#ff4757; color:white; border:none; padding:10px 18px; border-radius:10px; cursor:pointer; font-weight: bold;">ဖျက်မည်</button>
                         </div>
                     `;
                 }).join('') || "<p style='text-align:center;'>ပစ္စည်းစာရင်းမရှိသေးပါ။</p>";
             }, error => {
-                console.error("Error: ", error);
-                if(error.code === 'permission-denied') {
-                    alert("Firebase Rules ထဲမှာ 'if true;' ပြောင်းရန် လိုအပ်နေပါသေးတယ်!");
+                if (error.code === 'permission-denied') {
+                    console.log("Permission denied. Check Firebase Rules.");
                 }
             });
         }
 
+        // ၅။ ပစ္စည်းဖျက်ခြင်း
         async function deleteProduct(id) {
             if (confirm("ဒီပစ္စည်းကို ဖျက်မှာ သေချာပါသလား?")) {
                 try {
@@ -111,8 +144,14 @@
                 }
             }
         }
-
-        loadAdminProducts();
     </script>
+
+    <style>
+        .form-control { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn-primary { background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-outline { background: transparent; border: 1px solid #007bff; color: #007bff; padding: 8px 15px; border-radius: 8px; cursor: pointer; }
+        .shadow { box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .hidden { display: none; }
+    </style>
 </body>
 </html>
