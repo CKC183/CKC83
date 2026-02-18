@@ -121,7 +121,7 @@ async function placeOrder() {
         });
 
         // ၃။ Telegram သို့ ပုံနှင့်စာ တွဲပို့ခြင်း
-        const caption = `🛒 *Order အသစ်ရောက်ပါပြီ!*\n\n👤 ဝယ်သူ: ${user.email}\n📦 ပစ္စည်း: ${selectedItem.name}\n💰 စျေး: ${selectedItem.price} MMK\n📞 ဖုန်း: ${phone}\n🏠 လိပ်စာ: ${addr}\n💳 ငွေလွှဲဖုန်း: 09 724 793 3813`;
+        const caption = `🛒 *Order အသစ်ရောက်ပါပြီ!*\n\n👤 ဝယ်သူ: ${user.email}\n📦 ပစ္စည်း: ${selectedItem.name}\n💰 စျေး: ${selectedItem.price} MMK\n📞 ဖုန်း: ${phone}\n🏠 လိပ်စာ: ${addr}\n💳 ငွေလွှဲဖုန်း: 09444787353`;
 
         const telegramUrl = `https://api.telegram.org/bot${botToken}/sendPhoto`;
         const teleFormData = new FormData();
@@ -159,4 +159,5 @@ function openHistory() {
 
 
 function logout() { auth.signOut().then(() => location.href = "login.html"); }
+
 
