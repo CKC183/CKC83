@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="form-box shadow" style="background:white; padding:20px; border-radius:15px; margin-top:20px;">
+            <h3>➕ ပစ္စည်းအသစ်ထည့်မည်</h3>
+            <input type="text" id="pName" placeholder="ပစ္စည်းအမည်">
+            <input type="number" id="pPrice" placeholder="စျေးနှုန်း">
+            
+            <p style="font-size: 14px; margin-bottom: 5px;">အမျိုးအစား (ရိုက်ထည့်ပါ သို့မဟုတ် ရွေးပါ):</p>
+            <input type="text" id="pCat" list="category-options" placeholder="အမျိုးအစား">
+            <datalist id="category-options">
+                <option value="အကျီ"><option value="ဘောင်းဘီ"><option value="ဖိနပ်"><option value="အိတ်">
+            </datalist>
+
+            <input type="number" id="pStock" placeholder="Stock အရေအတွက်">
+            <input type="text" id="pImg" placeholder="ပုံ Link (Direct Link)">
+            <button class="btn-primary" onclick="addProduct()">ပစ္စည်းတင်မည်</button>
+            <button onclick="location.href='index.html'" class="btn-outline">Shop သို့သွားရန်</button>
+        </div>
+
+        <div id="admin-list" class="admin-grid" style="margin-top:20px;"></div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDXRD2jCUghozQtZFwDMJK2u7XdXVwImpg",
+            authDomain: "market-e7bac.firebaseapp.com",
+            projectId: "market-e7bac",
+            storageBucket: "market-e7bac.firebasestorage.app",
+            messagingSenderId: "372627788417",
+            appId: "1:372627788417:web:1faf2d22a4aa1d58afb380"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        async function addProduct() {
+            const name = document.getElementById('pName').value;
+            const price = document.getElementById('pPrice').value;
+            const cat = document.getElementById('pCat').value;
+            const stock = document.getElementById('pStock').value;
+            const img = document.getElementById('pImg').value;
+
+            if (name && price && cat && img) {
+                await db.collection("products").add({
+                    name, price: Number(price), category: cat,
+                    stock: Number(stock), image: img, createdAt: new Date()
+                });
+                alert("ပစ္စည်းတင်ပြီးပါပြီ");
+                location.reload();
+            } else { alert("အကုန်ဖြည့်ပါ"); }
+        }
+
+        db.collection("products").orderBy("createdAt", "desc").onSnapshot(snap => {
+            document.getElementById("admin-list").innerHTML = snap.docs.map(doc => `
+                <div class="admin-item shadow" style="display:flex; justify-content:space-between; align-items:center; background:white; padding:10px; margin-bottom:10px; border-radius:10px;">
+                    <span>${doc.data().name} (${doc.data().category})</span>
+                    <button onclick="deleteProduct('${doc.id}')" style="background:red; color:white; border:none; padding:5px 10px; border-radius:5px;">ဖျက်မည်</button>
+                </div>
+            `).join('');
+        });
+
+        async function deleteProduct(id) {
+            if(confirm("ဖျက်မှာလား?")) await db.collection("products").doc(id).delete();
+        }
+    </script>
+</body>
+</html>

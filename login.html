@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - MyStore</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
+</head>
+<body class="auth-page">
+    <div class="login-card shadow">
+        <h2 class="logo">MyStore</h2>
+        
+        <div id="login-form">
+            <p>အကောင့်ဝင်ရန်</p>
+            <input type="email" id="email" placeholder="အီးမေးလ်">
+            <input type="password" id="pass" placeholder="Password">
+            <button class="btn-primary" onclick="handleLogin()">Login ဝင်မည်</button>
+            <p style="font-size: 14px; margin-top: 15px;">
+                အကောင့်မရှိသေးပါက <a href="#" onclick="toggleAuth()">ဒီမှာအကောင့်ဖွင့်ပါ</a>
+            </p>
+        </div>
+
+        <div id="register-form" class="hidden">
+            <p>အကောင့်သစ်ဖွင့်ရန်</p>
+            <input type="email" id="reg-email" placeholder="အီးမေးလ်အသစ်">
+            <input type="password" id="reg-pass" placeholder="Password (အနည်းဆုံး ၆ လုံး)">
+            <button class="btn-primary" onclick="handleRegister()" style="background: #2ecc71;">အကောင့်ဖွင့်မည်</button>
+            <p style="font-size: 14px; margin-top: 15px;">
+                အကောင့်ရှိပြီးသားဆိုလျှင် <a href="#" onclick="toggleAuth()">Login ပြန်ဝင်ပါ</a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // ၁။ Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyDXRD2jCUghozQtZFwDMJK2u7XdXVwImpg",
+            authDomain: "market-e7bac.firebaseapp.com",
+            projectId: "market-e7bac",
+            storageBucket: "market-e7bac.firebasestorage.app",
+            messagingSenderId: "372627788417",
+            appId: "1:372627788417:web:1faf2d22a4aa1d58afb380"
+        };
+
+        // ၂။ Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        // ၃။ Toggle Form
+        function toggleAuth() {
+            document.getElementById("login-form").classList.toggle("hidden");
+            document.getElementById("register-form").classList.toggle("hidden");
+        }
+
+        // ၄။ Login Function
+        async function handleLogin() {
+            const email = document.getElementById("email").value;
+            const pass = document.getElementById("pass").value;
+
+            if(!email || !pass) return alert("အချက်အလက်ပြည့်စုံစွာဖြည့်ပါ");
+
+            try {
+                await auth.signInWithEmailAndPassword(email, pass);
+                if(email === "admin@gmail.com") {
+                    location.href = "admin.html";
+                } else {
+                    location.href = "index.html";
+                }
+            } catch (error) {
+                alert("Email သို့မဟုတ် Password မှားယွင်းနေပါသည် သို့မဟုတ် အကောင့်မရှိသေးပါ။");
+            }
+        }
+
+        // ၅။ Register Function
+        async function handleRegister() {
+            const email = document.getElementById("reg-email").value;
+            const pass = document.getElementById("reg-pass").value;
+
+            if(!email || !pass) return alert("အချက်အလက်ပြည့်စုံစွာဖြည့်ပါ");
+            if(pass.length < 6) return alert("Password သည် အနည်းဆုံး ၆ လုံးရှိရပါမည်");
+
+            try {
+                await auth.createUserWithEmailAndPassword(email, pass);
+                alert("အကောင့်ဖွင့်ခြင်း အောင်မြင်ပါသည်။");
+                location.href = "index.html";
+            } catch (error) {
+                alert("အမှားအယွင်းရှိပါသည်: " + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
