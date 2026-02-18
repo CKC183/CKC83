@@ -1,69 +1,99 @@
-/* ၁။ အခြေခံ Setting များ */
-body {
-    font-family: 'Pyidaungsu', 'Segoe UI', sans-serif; /* မြန်မာစာအတွက် */
-    background-color: #f4f7f9;
+/* --- Global Styles --- */
+* {
+    box-sizing: border-box; /* Element တွေ ဘောင်ကျော်မထွက်အောင် ထိန်းပေးသည် */
     margin: 0;
     padding: 0;
+}
+
+body {
+    font-family: 'Pyidaungsu', 'Segoe UI', sans-serif;
+    background-color: #f8f9fa;
+    color: #333;
+    line-height: 1.6;
 }
 
 .container {
     max-width: 1100px;
     margin: 0 auto;
-    padding: 15px;
+    padding: 20px;
 }
 
-/* ၂။ ပစ္စည်းများကို ဘေးတိုက်စီရန် (Grid သုံးထားသည်) */
-.product-grid {
+/* --- Product Grid (ဘေးတိုက်စီရန် အဓိကအပိုင်း) --- */
+.product-grid, .admin-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* ၂ ခုမှ ၅ ခုအထိ ဘေးတိုက်စီပေးမည် */
-    gap: 15px;
+    /* ကွန်ပျူတာမှာ အနည်းဆုံး ၁၈၀px ရှိတဲ့ ကွက်လပ်တွေ ဘေးတိုက်စီမယ် */
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); 
+    gap: 20px;
     padding: 20px 0;
 }
 
-/* ၃။ ပစ္စည်းကတ်ပြား ဒီဇိုင်း (ပုံ ၆ ထဲကလို အောက်မဆင်းစေရန်) */
-.product-card {
-    background: white;
+/* --- Product Card Design --- */
+.product-card, .admin-item {
+    background: #fff;
     border-radius: 12px;
-    padding: 12px;
+    padding: 15px;
     text-align: center;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
     display: flex;
-    flex-direction: column; /* အထဲကစာသားတွေပဲ အပေါ်အောက်စီမည် */
+    flex-direction: column;
     justify-content: space-between;
-    transition: 0.3s;
+    transition: 0.3s ease;
 }
 
-.product-card:hover { transform: translateY(-3px); }
-
-.product-card img {
+.product-card img, .admin-item img {
     width: 100%;
     height: 160px;
-    object-fit: contain; /* ပုံမပြဲအောင် ထိန်းသည် */
+    object-fit: contain; /* ပုံတွေ မပြဲသွားအောင် ထိန်းပေးသည် */
     border-radius: 8px;
+    margin-bottom: 10px;
 }
 
 .product-card h4 {
-    margin: 10px 0 5px;
     font-size: 1rem;
-    height: 40px; /* စာသားတန်းညီအောင် */
+    margin-bottom: 5px;
+    height: 45px; /* စာသား ၂ ကြောင်းစာ တန်းစီပေးထားသည် */
     overflow: hidden;
 }
 
 .price-text {
     color: #007bff;
     font-weight: bold;
+    font-size: 1.1rem;
     margin-bottom: 10px;
 }
 
-/* ၄။ ဝယ်ယူရန် Modal (အရေအတွက် Box ပါဝင်သည်) */
+/* --- Form & Buttons --- */
+.form-control {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    width: 100%;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-primary:hover { background-color: #0056b3; }
+
+/* --- Modal (မှာယူရန်နေရာ) --- */
 .modal {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0,0,0,0.5);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 9999;
+    z-index: 1000;
 }
 
 .modal-content {
@@ -74,44 +104,17 @@ body {
     max-width: 400px;
 }
 
-/* Form ထဲက Input များ */
-.form-control {
-    width: 100%;
-    padding: 10px;
-    margin: 8px 0;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    box-sizing: border-box; /* ဘောင်မကျော်စေရန် */
-}
-
-/* အရေအတွက် (Quantity) Box အတွက် သီးသန့် */
-#pQty {
-    border: 2px solid #007bff;
-    font-weight: bold;
-    text-align: center;
-}
-
-/* ၅။ ခလုတ်ဒီဇိုင်း */
-.btn-primary {
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
-    width: 100%;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-.btn-confirm { background: #28a745; margin-top: 10px; }
-
-/* ၆။ ဖုန်းအတွက် CSS (တစ်တန်းလျှင် ၂ ခုပြရန်) */
-@media (max-width: 500px) {
+/* --- ဖုန်းအတွက် အထူးပြင်ဆင်ချက် (Responsive) --- */
+@media (max-width: 600px) {
     .product-grid {
-        grid-template-columns: repeat(2, 1fr); /* တစ်တန်း ၂ ခုစီ */
+        /* ဖုန်းမှာ တစ်တန်းကို ၂ ခုစီ ဘေးတိုက်ပြမယ် */
+        grid-template-columns: repeat(2, 1fr); 
         gap: 10px;
     }
-    .product-card img { height: 130px; }
+    
+    .product-card img {
+        height: 130px;
+    }
 }
 
 .hidden { display: none !important; }
