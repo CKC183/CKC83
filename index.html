@@ -5,65 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MyStore - Shopping</title>
     <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <nav class="navbar shadow">
-        <div class="container nav-flex">
-            <span class="logo" onclick="location.reload()">MyStore</span>
-            <div class="nav-right">
-                <div class="dropdown">
-                    <button class="dropbtn" onclick="toggleMenu()">⋮</button>
-                    <div id="myDropdown" class="dropdown-content">
-                        <a href="#" onclick="openHistory()">📜 မှာယူမှုမှတ်တမ်း</a>
-                        <a href="#" onclick="logout()" style="color:red">🚪 Logout</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <div class="container">
-        <div class="category-bar" id="cat-filter">
-            <button class="cat-btn active" onclick="filterProduct('All')">အားလုံး</button>
-        </div>
-        <div id="product-display" class="product-grid"></div>
-
-        <div id="order-section" class="order-form shadow hidden">
-            <h3 style="text-align:center">🛒 မှာယူရန်အချက်အလက်</h3>
-            
-            <div style="background: #fff3cd; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #ffeeba;">
-                <p style="margin:0; color: #856404; font-weight: bold;">💰 ငွေလွှဲရန် ဖုန်းနံပါတ် { U WIN ZAW }</p>
-                <p style="margin:5px 0 0 0; font-size: 18px;">Kpay / Wave: <strong>09444787353</strong></p>
-            </div>
-
-            <div class="selected-box">
-                <p>ပစ္စည်း: <strong id="selected-item-name"></strong></p>
-                <p>စျေးနှုန်း: <strong id="selected-item-price"></strong> MMK</p>
-            </div>
-
-            <input type="text" id="custPhone" placeholder="သင့်ဖုန်းနံပါတ်">
-            <textarea id="custAddress" placeholder="ပို့ဆောင်ရမည့်လိပ်စာ"></textarea>
-            
-            <p style="font-size: 14px; margin-top: 10px; font-weight: bold;">📸 ငွေလွှဲပြေစာ (Gallery မှရွေးပါ):</p>
-            <input type="file" id="payFile" accept="image/*">
-            
-            <button id="orderBtn" class="btn-primary" onclick="placeOrder()">မှာယူမှုကို အတည်ပြုပါ</button>
-            <button class="btn-outline" onclick="closeOrder()">ပယ်ဖျက်မည်</button>
-        </div>
-    </div>
-
-    <div id="historyModal" class="modal hidden">
-        <div class="modal-content shadow">
-            <span class="close" onclick="closeHistory()">&times;</span>
-            <h3>ကျွန်ုပ်၏ Order ရာဇဝင်</h3>
-            <div id="order-history-list"></div>
-        </div>
-    </div>
-
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.0/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+    <header class="header shadow">
+        <div class="nav-container">
+            <h2 onclick="location.reload()" style="cursor:pointer;">MyStore</h2>
+            <div class="nav-right">
+                <button class="menu-btn" onclick="toggleMenu()">☰ Menu</button>
+                <div id="myDropdown" class="dropdown-content">
+                    <a href="#" onclick="logout()">Logout</a>
+                    <a href="admin.html">Admin Panel</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="cat-filter" class="category-bar">
+            </div>
+
+        <div id="product-display" class="product-grid">
+            <p style="text-align:center; grid-column: 1/-1;">ပစ္စည်းများ Loading လုပ်နေသည်...</p>
+        </div>
+    </div>
+
+    <div id="order-section" class="modal hidden">
+        <div class="modal-content shadow">
+            <span class="close-btn" onclick="closeOrder()">&times;</span>
+            <h3>🛒 ပစ္စည်းမှာယူရန်</h3>
+            <hr>
+            
+            <div class="order-info">
+                <p>ပစ္စည်းအမည်: <strong id="selected-item-name">-</strong></p>
+                <p>စျေးနှုန်း: <strong id="selected-item-price">0</strong> MMK</p>
+            </div>
+
+            <div class="form-group">
+                <label>ဝယ်ယူမည့် အရေအတွက်:</label>
+                <input type="number" id="pQty" value="1" min="1" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label>သင့်ဖုန်းနံပါတ်:</label>
+                <input type="text" id="custPhone" placeholder="09xxxxxxxxx" class="form-control">
+            </div>
+
+            <div class="form-group">
+                <label>ပို့ဆောင်ရမည့် လိပ်စာ:</label>
+                <textarea id="custAddress" placeholder="မြို့နယ်၊ လမ်း၊ အိမ်အမှတ်" class="form-control"></textarea>
+            </div>
+
+            <div class="form-group payment-box">
+                <p><strong>KBZ Pay / Wave Pay: 09444787353</strong></p>
+                <label>ငွေလွှဲဖြတ်ပိုင်း (Screenshot) တင်ပါ:</label>
+                <input type="file" id="payFile" accept="image/*" class="form-control">
+            </div>
+
+            <button id="orderBtn" class="btn-confirm" onclick="placeOrder()">မှာယူမှုကို အတည်ပြုပါ</button>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
-
 </html>
