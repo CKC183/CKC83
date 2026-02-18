@@ -16,7 +16,7 @@ const db = firebase.firestore();
 // ၃။ API & Bot Settings (သင်ပေးထားသော key များ)
 const IMGBB_API_KEY = "5501f0336d39021477b3b1acd38d8b43"; 
 const botToken = "8515358728:AAGDeorFQbt1QGVOqHgr_Z7atlRHkoWRlPY";
-const chatId = "7247933813";
+const chatId = "6042207690";
 
 let allProducts = [];
 let selectedItem = null;
@@ -159,3 +159,4 @@ function openHistory() {
 
 
 function logout() { auth.signOut().then(() => location.href = "login.html"); }
+
