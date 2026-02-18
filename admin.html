@@ -32,85 +32,87 @@
     </div>
 
     <script>
-    const firebaseConfig = {
-    apiKey: "AIzaSyD0oFN72HDNioauZHRyPd3Oh_I04abNgDs",
-    authDomain: "marker1-6736f.firebaseapp.com",
-    projectId: "marker1-6736f",
-    storageBucket: "marker1-6736f.firebasestorage.app",
-    messagingSenderId: "886941886218",
-    appId: "1:886941886218:web:aac97e95f46682924ffcf3"
-  };
+        // သင့်ရဲ့ Config အသစ်ကို အမှန်ထည့်ပေးထားပါတယ်
+        const firebaseConfig = {
+            apiKey: "AIzaSyD0oFN72HDNioauZHRyPd3Oh_I04abNgDs",
+            authDomain: "marker1-6736f.firebaseapp.com",
+            projectId: "marker1-6736f",
+            storageBucket: "marker1-6736f.firebasestorage.app",
+            messagingSenderId: "886941886218",
+            appId: "1:886941886218:web:aac97e95f46682924ffcf3"
+        };
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
 
-    // ၁။ ပစ္စည်းတင်တဲ့ Function
-    async function addProduct() {
-        const name = document.getElementById('pName').value;
-        const price = document.getElementById('pPrice').value;
-        const cat = document.getElementById('pCat').value;
-        const stock = document.getElementById('pStock').value;
-        const img = document.getElementById('pImg').value;
+        async function addProduct() {
+            const name = document.getElementById('pName').value;
+            const price = document.getElementById('pPrice').value;
+            const cat = document.getElementById('pCat').value;
+            const stock = document.getElementById('pStock').value;
+            const img = document.getElementById('pImg').value;
 
-        if (!name || !price || !cat || !img) {
-            return alert("အချက်အလက်အားလုံး ဖြည့်ပေးပါ");
-        }
+            if (!name || !price || !cat || !img) {
+                return alert("အချက်အလက်အားလုံး ပြည့်စုံအောင် ဖြည့်ပေးပါ");
+            }
 
-        try {
-            await db.collection("products").add({
-                name: name,
-                price: Number(price),
-                category: cat,
-                stock: Number(stock) || 0,
-                image: img,
-                createdAt: new Date().getTime() // အချိန်ကို Number အဖြစ်သိမ်းလိုက်ခြင်း (Error ကင်းစေရန်)
-            });
-
-            alert("ပစ္စည်းတင်ပြီးပါပြီ");
-            location.reload(); // စာမျက်နှာကို refresh လုပ်ပြီး စာရင်းပြန်ပြမည်
-        } catch (e) {
-            alert("တင်မရပါ: " + e.message);
-        }
-    }
-
-    // ၂။ ပစ္စည်းစာရင်းကို ဆွဲထုတ်ပြီး ဖျက်လို့ရအောင်လုပ်ခြင်း
-    function loadAdminProducts() {
-        // createdAt မရှိတဲ့ data တွေကြောင့် error မတက်အောင် ရိုးရိုးပဲ ဆွဲထုတ်ပါမယ်
-        db.collection("products").onSnapshot(snap => {
-            const list = document.getElementById("admin-list");
-            if (!list) return;
-
-            list.innerHTML = snap.docs.map(doc => {
-                const p = doc.data();
-                return `
-                    <div class="admin-item shadow" style="display:flex; justify-content:space-between; align-items:center; background:white; padding:15px; margin-bottom:10px; border-radius:10px;">
-                        <div style="display:flex; align-items:center; gap:15px;">
-                            <img src="${p.image}" style="width:50px; height:50px; border-radius:8px; object-fit:cover;">
-                            <div>
-                                <strong style="display:block;">${p.name}</strong>
-                                <small style="color:gray;">${p.price} MMK | ${p.category}</small>
-                            </div>
-                        </div>
-                        <button onclick="deleteProduct('${doc.id}')" style="background:#ff4757; color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer;">ဖျက်မည်</button>
-                    </div>
-                `;
-            }).join('') || "<p style='text-align:center;'>ပစ္စည်းစာရင်းမရှိသေးပါ။</p>";
-        });
-    }
-
-    // ၃။ ပစ္စည်းဖျက်တဲ့ Function
-    async function deleteProduct(id) {
-        if (confirm("ဒီပစ္စည်းကို ဖျက်မှာ သေချာပါသလား?")) {
             try {
-                await db.collection("products").doc(id).delete();
-                alert("ဖျက်ပြီးပါပြီ");
+                await db.collection("products").add({
+                    name: name,
+                    price: Number(price),
+                    category: cat,
+                    stock: Number(stock) || 0,
+                    image: img,
+                    createdAt: new Date().getTime()
+                });
+                alert("ပစ္စည်းတင်ပြီးပါပြီ");
+                location.reload();
             } catch (e) {
-                alert("ဖျက်မရပါ: " + e.message);
+                alert("တင်မရပါ: " + e.message);
             }
         }
-    }
 
-    // စာမျက်နှာ စဖွင့်တာနဲ့ ပစ္စည်းစာရင်းပြမည်
-    loadAdminProducts();
-</script>
+        function loadAdminProducts() {
+            // orderBy ထည့်ပြီး အချိန်အလိုက် စီပေးထားပါတယ်
+            db.collection("products").orderBy("createdAt", "desc").onSnapshot(snap => {
+                const list = document.getElementById("admin-list");
+                if (!list) return;
 
+                list.innerHTML = snap.docs.map(doc => {
+                    const p = doc.data();
+                    return `
+                        <div class="admin-item shadow" style="display:flex; justify-content:space-between; align-items:center; background:white; padding:15px; margin-bottom:10px; border-radius:10px;">
+                            <div style="display:flex; align-items:center; gap:15px;">
+                                <img src="${p.image}" style="width:50px; height:50px; border-radius:8px; object-fit:cover;" onerror="this.src='https://via.placeholder.com/50'">
+                                <div>
+                                    <strong style="display:block;">${p.name}</strong>
+                                    <small style="color:gray;">${p.price} MMK | ${p.category}</small>
+                                </div>
+                            </div>
+                            <button onclick="deleteProduct('${doc.id}')" style="background:#ff4757; color:white; border:none; padding:8px 15px; border-radius:8px; cursor:pointer;">ဖျက်မည်</button>
+                        </div>
+                    `;
+                }).join('') || "<p style='text-align:center;'>ပစ္စည်းစာရင်းမရှိသေးပါ။</p>";
+            }, error => {
+                console.error("Error: ", error);
+                if(error.code === 'permission-denied') {
+                    alert("Firebase Rules ထဲမှာ 'if true;' ပြောင်းရန် လိုအပ်နေပါသေးတယ်!");
+                }
+            });
+        }
+
+        async function deleteProduct(id) {
+            if (confirm("ဒီပစ္စည်းကို ဖျက်မှာ သေချာပါသလား?")) {
+                try {
+                    await db.collection("products").doc(id).delete();
+                    alert("ဖျက်ပြီးပါပြီ");
+                } catch (e) {
+                    alert("ဖျက်မရပါ: " + e.message);
+                }
+            }
+        }
+
+        loadAdminProducts();
+    </script>
+</body>
+</html>
