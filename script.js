@@ -1,11 +1,11 @@
-// ၁။ Firebase Config
+// ၁။ Firebase Config (သင့် Project ID marker1-6736f အတွက်)
 const firebaseConfig = {
-  apiKey: "AIzaSyD0oFN72HDNioauZHRyPd3Oh_I04abNgDs",
-  authDomain: "marker1-6736f.firebaseapp.com",
-  projectId: "marker1-6736f",
-  storageBucket: "marker1-6736f.firebasestorage.app",
-  messagingSenderId: "886941886218",
-  appId: "1:886941886218:web:aac97e95f46682924ffcf3"
+    apiKey: "AIzaSyD0oFN72HDNioauZHRyPd3Oh_I04abNgDs",
+    authDomain: "marker1-6736f.firebaseapp.com",
+    projectId: "marker1-6736f",
+    storageBucket: "marker1-6736f.firebasestorage.app",
+    messagingSenderId: "886941886218",
+    appId: "1:886941886218:web:aac97e95f46682924ffcf3"
 };
 
 // ၂။ Initialize Firebase
@@ -13,26 +13,21 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-// ၃။ API & Bot Settings (သင်ပေးထားသော key များ)
+// ၃။ API & Bot Settings
 const IMGBB_API_KEY = "5501f0336d39021477b3b1acd38d8b43"; 
 const botToken = "8515358728:AAGDeorFQbt1QGVOqHgr_Z7atlRHkoWRlPY";
-const chatId = "6042207690";
+const chatId = "7247933813";
 
 let allProducts = [];
 let selectedItem = null;
 
-// --- Modal Controls ---
-function toggleMenu() { document.getElementById("myDropdown").classList.toggle("show"); }
-function closeOrder() { document.getElementById("order-section").classList.add("hidden"); }
-function closeHistory() { document.getElementById("historyModal").classList.add("hidden"); }
-
-// --- Auth State ---
+// --- Auth State Check ---
 auth.onAuthStateChanged(user => {
     if (user) { loadProducts(); } 
     else { if (!window.location.pathname.includes("login.html")) window.location.href = "login.html"; }
 });
 
-// --- Product Logic ---
+// --- Product Loading & Display ---
 function loadProducts() {
     db.collection("products").onSnapshot(snap => {
         allProducts = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
@@ -65,19 +60,25 @@ function filterProduct(cat) {
     `).join('');
 }
 
+// --- Order Modal Open ---
 function openOrder(name, price) {
     selectedItem = { name, price };
     document.getElementById("selected-item-name").innerText = name;
     document.getElementById("selected-item-price").innerText = price;
+    
+    // အရေအတွက်ကို ၁ လို့ default ပြန်ထားပေးခြင်း
+    if(document.getElementById("pQty")) document.getElementById("pQty").value = 1;
+    
     document.getElementById("order-section").classList.remove("hidden");
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// --- မှာယူခြင်း Logic (Gallery မှပုံတင်ပြီး Telegram ပို့ခြင်း) ---
+// --- မှာယူခြင်း Logic (အသစ်ပြင်ထားသော အပိုင်း) ---
 async function placeOrder() {
     const user = auth.currentUser;
     const phone = document.getElementById('custPhone').value;
     const addr = document.getElementById('custAddress').value;
+    const qty = document.getElementById('pQty').value || 1; // အရေအတွက်ရွေးထားတာယူမယ်
     const fileInput = document.getElementById('payFile');
     const orderBtn = document.getElementById('orderBtn');
 
@@ -87,6 +88,10 @@ async function placeOrder() {
 
     orderBtn.disabled = true;
     orderBtn.innerText = "ပုံတင်နေသည်...";
+
+    // လက်ရှိ ရက်စွဲနှင့် အချိန်ကို မြန်မာစံတော်ချိန်ဖြင့် ယူခြင်း
+    const now = new Date();
+    const fullDate = now.toLocaleString('en-GB'); 
 
     try {
         // ၁။ ImgBB သို့ ပုံအရင်တင်ခြင်း
@@ -100,40 +105,51 @@ async function placeOrder() {
         
         const imgData = await imgResponse.json();
 
-        // ပုံတင်တာ အောင်မြင်မှုရှိမရှိ စစ်ခြင်း (Error 'url' properties undefined မဖြစ်အောင်)
-        if (!imgData.success) {
-            throw new Error(imgData.error ? imgData.error.message : "ပုံတင်လို့မရပါ");
+        if (imgData.success) {
+            const imageUrl = imgData.data.url;
+            const totalPrice = Number(selectedItem.price) * Number(qty); // စုစုပေါင်းစျေးတွက်ချက်ခြင်း
+
+            // ၂။ Firebase Firestore ထဲ သိမ်းခြင်း
+            await db.collection("orders").add({
+                userId: user.uid,
+                userEmail: user.email,
+                itemName: selectedItem.name,
+                price: selectedItem.price,
+                quantity: Number(qty),
+                total: totalPrice,
+                phone: phone,
+                address: addr,
+                screenshot: imageUrl,
+                status: "စစ်ဆေးနေဆဲ",
+                date: fullDate
+            });
+
+            // ၃။ Telegram သို့ ပုံနှင့်စာ တွဲပို့ခြင်း (ဖုန်းနံပါတ် 09444787353 သို့ ပြောင်းထားပါသည်)
+            const caption = `🛒 *Order အသစ်ရောက်ပါပြီ!*\n\n` +
+                            `📅 ရက်စွဲ: ${fullDate}\n` +
+                            `👤 ဝယ်သူ: ${user.email}\n` +
+                            `📦 ပစ္စည်း: ${selectedItem.name}\n` +
+                            `🔢 အရေအတွက်: ${qty} ခု\n` +
+                            `💰 စုစုပေါင်းစျေး: ${totalPrice} MMK\n` +
+                            `📞 ဖုန်း: ${phone}\n` +
+                            `🏠 လိပ်စာ: ${addr}\n\n` +
+                            `💳 *ငွေလွှဲဖုန်း: 09444787353*`;
+
+            const telegramUrl = `https://api.telegram.org/bot${botToken}/sendPhoto`;
+            const teleFormData = new FormData();
+            teleFormData.append("chat_id", chatId);
+            teleFormData.append("photo", imageUrl);
+            teleFormData.append("caption", caption);
+            teleFormData.append("parse_mode", "Markdown");
+
+            await fetch(telegramUrl, { method: "POST", body: teleFormData });
+
+            alert("မှာယူမှု အောင်မြင်ပါသည်။");
+            closeOrder();
+            location.reload(); 
+        } else {
+            throw new Error(imgData.error.message);
         }
-
-        const imageUrl = imgData.data.url;
-
-        // ၂။ Firebase Firestore ထဲ သိမ်းခြင်း
-        await db.collection("orders").add({
-            userId: user.uid,
-            userEmail: user.email,
-            itemName: selectedItem.name,
-            price: selectedItem.price,
-            phone: phone,
-            address: addr,
-            screenshot: imageUrl,
-            status: "စစ်ဆေးနေဆဲ",
-            date: new Date().toLocaleString()
-        });
-
-        // ၃။ Telegram သို့ ပုံနှင့်စာ တွဲပို့ခြင်း
-        const caption = `🛒 *Order အသစ်ရောက်ပါပြီ!*\n\n👤 ဝယ်သူ: ${user.email}\n📦 ပစ္စည်း: ${selectedItem.name}\n💰 စျေး: ${selectedItem.price} MMK\n📞 ဖုန်း: ${phone}\n🏠 လိပ်စာ: ${addr}\n💳 ငွေလွှဲဖုန်း: 09444787353`;
-
-        const telegramUrl = `https://api.telegram.org/bot${botToken}/sendPhoto`;
-        const teleFormData = new FormData();
-        teleFormData.append("chat_id", chatId);
-        teleFormData.append("photo", imageUrl);
-        teleFormData.append("caption", caption);
-        teleFormData.append("parse_mode", "Markdown");
-
-        await fetch(telegramUrl, { method: "POST", body: teleFormData });
-
-        alert("မှာယူမှု အောင်မြင်ပါသည်။");
-        closeOrder();
     } catch (e) {
         alert("အမှားရှိပါသည်: " + e.message);
     } finally {
@@ -142,22 +158,7 @@ async function placeOrder() {
     }
 }
 
-// --- History & Logout ---
-function openHistory() {
-    const user = auth.currentUser;
-    if(!user) return;
-    document.getElementById("historyModal").classList.remove("hidden");
-    db.collection("orders").where("userId", "==", user.uid).get().then(snap => {
-        document.getElementById("order-history-list").innerHTML = snap.docs.map(doc => `
-            <div class="history-item" style="border-bottom: 1px solid #eee; padding: 10px 0;">
-                <strong>${doc.data().itemName}</strong> - ${doc.data().price} MMK<br>
-                <small>${doc.data().date} | <span style="color:blue">${doc.data().status}</span></small>
-            </div>
-        `).join('') || "မှာယူမှုမရှိသေးပါ။";
-    });
-}
-
-
+// --- UI Helpers ---
+function toggleMenu() { document.getElementById("myDropdown").classList.toggle("show"); }
+function closeOrder() { document.getElementById("order-section").classList.add("hidden"); }
 function logout() { auth.signOut().then(() => location.href = "login.html"); }
-
-
