@@ -1,130 +1,117 @@
-/* အခြေခံ Setting များ */
+/* ၁။ အခြေခံ Setting များ */
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f0f2f5;
+    font-family: 'Pyidaungsu', 'Segoe UI', sans-serif; /* မြန်မာစာအတွက် */
+    background-color: #f4f7f9;
     margin: 0;
     padding: 0;
-    color: #333;
 }
 
 .container {
-    max-width: 1200px;
+    max-width: 1100px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 15px;
 }
 
-/* ပစ္စည်းများကို ဘေးတိုက်စီရန် (Grid System) */
+/* ၂။ ပစ္စည်းများကို ဘေးတိုက်စီရန် (Grid သုံးထားသည်) */
 .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* ပစ္စည်းများကို အလိုအလျောက် ဘေးတိုက်စီမည် */
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* ၂ ခုမှ ၅ ခုအထိ ဘေးတိုက်စီပေးမည် */
+    gap: 15px;
     padding: 20px 0;
 }
 
-/* ပစ္စည်းကတ်ပြား ဒီဇိုင်း */
+/* ၃။ ပစ္စည်းကတ်ပြား ဒီဇိုင်း (ပုံ ၆ ထဲကလို အောက်မဆင်းစေရန်) */
 .product-card {
     background: white;
-    border-radius: 15px;
-    padding: 15px;
-    text-align: center;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    transition: transform 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
-.product-card:hover {
-    transform: translateY(-5px);
-}
-
-.product-card img {
-    width: 100%;
-    height: 180px;
-    object-fit: contain; /* ပုံမရှုံ့သွားအောင် ထိန်းပေးသည် */
-    border-radius: 10px;
-    margin-bottom: 10px;
-}
-
-.product-card h4 {
-    margin: 10px 0;
-    font-size: 1.1rem;
-    color: #222;
-}
-
-.price-text {
-    color: #e44d26;
-    font-weight: bold;
-    font-size: 1.2rem;
-    margin-bottom: 15px;
-}
-
-/* ခလုတ်ဒီဇိုင်း */
-.btn-primary {
-    background: linear-gradient(135deg, #007bff, #0056b3);
-    color: white;
-    border: none;
+    border-radius: 12px;
     padding: 12px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 600;
-    width: 100%;
-}
-
-/* Category Filter Bar */
-.category-bar {
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
     display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    padding: 10px 0;
-    margin-bottom: 20px;
-}
-
-.cat-btn {
-    background: white;
-    border: 1px solid #ddd;
-    padding: 8px 20px;
-    border-radius: 20px;
-    white-space: nowrap;
-    cursor: pointer;
+    flex-direction: column; /* အထဲကစာသားတွေပဲ အပေါ်အောက်စီမည် */
+    justify-content: space-between;
     transition: 0.3s;
 }
 
-.cat-btn:hover, .cat-btn.active {
-    background: #007bff;
-    color: white;
-    border-color: #007bff;
+.product-card:hover { transform: translateY(-3px); }
+
+.product-card img {
+    width: 100%;
+    height: 160px;
+    object-fit: contain; /* ပုံမပြဲအောင် ထိန်းသည် */
+    border-radius: 8px;
 }
 
-/* Modal (မှာယူရန်နေရာ) ဒီဇိုင်း */
+.product-card h4 {
+    margin: 10px 0 5px;
+    font-size: 1rem;
+    height: 40px; /* စာသားတန်းညီအောင် */
+    overflow: hidden;
+}
+
+.price-text {
+    color: #007bff;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* ၄။ ဝယ်ယူရန် Modal (အရေအတွက် Box ပါဝင်သည်) */
 .modal {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.6);
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000;
+    z-index: 9999;
 }
 
 .modal-content {
     background: white;
-    padding: 30px;
-    border-radius: 20px;
+    padding: 25px;
+    border-radius: 15px;
     width: 90%;
-    max-width: 450px;
-    position: relative;
+    max-width: 400px;
+}
+
+/* Form ထဲက Input များ */
+.form-control {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-sizing: border-box; /* ဘောင်မကျော်စေရန် */
+}
+
+/* အရေအတွက် (Quantity) Box အတွက် သီးသန့် */
+#pQty {
+    border: 2px solid #007bff;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* ၅။ ခလုတ်ဒီဇိုင်း */
+.btn-primary {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    width: 100%;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.btn-confirm { background: #28a745; margin-top: 10px; }
+
+/* ၆။ ဖုန်းအတွက် CSS (တစ်တန်းလျှင် ၂ ခုပြရန်) */
+@media (max-width: 500px) {
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr); /* တစ်တန်း ၂ ခုစီ */
+        gap: 10px;
+    }
+    .product-card img { height: 130px; }
 }
 
 .hidden { display: none !important; }
-
-/* ဖုန်းအတွက် အထူးပြင်ဆင်ချက် */
-@media (max-width: 600px) {
-    .product-grid {
-        grid-template-columns: repeat(2, 1fr); /* ဖုန်းမှာ တစ်တန်းကို ၂ ခုစီပြမည် */
-        gap: 10px;
-        padding: 10px;
-    }
-    .product-card { padding: 10px; }
-    .product-card img { height: 140px; }
-}
