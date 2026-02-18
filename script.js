@@ -1,11 +1,11 @@
 // ၁။ Firebase Config
 const firebaseConfig = {
-  apiKey: "AIzaSyDXRD2jCUghozQtZFwDMJK2u7XdXVwImpg",
-  authDomain: "market-e7bac.firebaseapp.com",
-  projectId: "market-e7bac",
-  storageBucket: "market-e7bac.firebasestorage.app",
-  messagingSenderId: "372627788417",
-  appId: "1:372627788417:web:1faf2d22a4aa1d58afb380"
+  apiKey: "AIzaSyD0oFN72HDNioauZHRyPd3Oh_I04abNgDs",
+  authDomain: "marker1-6736f.firebaseapp.com",
+  projectId: "marker1-6736f",
+  storageBucket: "marker1-6736f.firebasestorage.app",
+  messagingSenderId: "886941886218",
+  appId: "1:886941886218:web:aac97e95f46682924ffcf3"
 };
 
 // ၂။ Initialize Firebase
@@ -156,5 +156,6 @@ function openHistory() {
         `).join('') || "မှာယူမှုမရှိသေးပါ။";
     });
 }
+
 
 function logout() { auth.signOut().then(() => location.href = "login.html"); }
